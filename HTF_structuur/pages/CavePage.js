@@ -40,7 +40,6 @@ export default class CavePage {
   }
 
   async solveCave(correctIndex) {
-    await this.waitForCaveLoaded();
     console.log(`Hover cave ${correctIndex}...`);
     await this.hoverSquare(correctIndex);
     

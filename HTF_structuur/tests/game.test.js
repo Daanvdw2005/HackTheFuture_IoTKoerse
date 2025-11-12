@@ -66,6 +66,6 @@ test('Hack The Future - Volledige gameflow', async ({ page }) => {
   await crash.doubleClickSquare();
   const correctCave = await cave.findCorrectCave();
   console.log(`Correcte cave: ${correctCave}`);
-  await cave.solveCave(1);
+  await cave.solveCave(correctCave);
   await waitForEnter();
 });
