@@ -95,7 +95,7 @@ class DockingBayPage {
 
   async waitForNextLevel() {
     console.log('22. Wachten op overgang naar volgende level...');
-    await this.page.waitForTimeout(5000);
+    await this.page.waitForTimeout(500);
     console.log('LEVEL VOLTOOID: Docking Bay → DROP → DUIKBOOT GEKLIKT!');
   }
 }

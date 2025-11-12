@@ -6,12 +6,23 @@ import OfficePage from '../pages/OfficePage.js';
 import DockingBayPage from '../pages/DockingBayPage.js';
 import SubmarinePage from '../pages/SubmarinePage.js';
 import CrashPage from '../pages/CrashPage.js';
+import readline from 'readline';
 
-// Increase timeout for this full game flow test because it performs many
-// sequential waits and navigations that can exceed the default 30s per-test timeout.
+// Hulpfunctie om Enter af te wachten
+async function waitForEnter() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  await new Promise((resolve) => rl.question('\n✅ Test voltooid. Druk op ENTER om af te sluiten...', () => {
+    rl.close();
+    resolve();
+  }));
+}
+
+// Verhoogd timeout voor volledige gameflow
 test.setTimeout(120000);
 
-// Volledige flow test
 test('Hack The Future - Volledige gameflow', async ({ page }) => {
   const home = new HomePage(page);
   const character = new CharacterSelectPage(page);
@@ -53,4 +64,7 @@ test('Hack The Future - Volledige gameflow', async ({ page }) => {
   await submarine.waitForNextLevel();
 
   await crash.doubleClickSquare();
+
+  // 👇 Pauze zodat het venster open blijft tot jij op Enter drukt
+  await waitForEnter();
 });

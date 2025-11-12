@@ -13,15 +13,29 @@ class SubmarinePage {
 
   async followArrows() {
     console.log('22. Start submarine level: volg de pijlen...');
-    // Give more time for the first instruction image to load/appear.
-    await this.instructionImg.waitFor({ state: 'visible', timeout: 40000 });
+
+    // Eerste zichtbaarheid wachten
+    try {
+      await this.instructionImg.waitFor({ state: 'visible', timeout: 20000 });
+    } catch {
+      console.log('⚠️ Geen eerste pijl gevonden — mogelijk is het level al klaar.');
+      return;
+    }
 
     let sequenceCount = 0;
     const maxSequences = 50;
 
     while (sequenceCount < maxSequences) {
-  // Inner loop: wait longer for each next arrow—some runs show delays.
-  await this.instructionImg.waitFor({ state: 'visible', timeout: 30000 });
+      // --- SAFE WAIT (vang timeout af) ---
+      const arrowVisible = await this.instructionImg
+        .waitFor({ state: 'visible', timeout: 10000 })
+        .then(() => true)
+        .catch(() => false);
+
+      if (!arrowVisible) {
+        console.log('✅ Geen nieuwe pijl meer — submarine level klaar.');
+        break; // Geen crash → gewoon afsluiten
+      }
 
       const src = await this.instructionImg.getAttribute('src');
       console.log(`   Pijl: ${src}`);
@@ -41,21 +55,23 @@ class SubmarinePage {
       console.log(`   → ${key} ingedrukt`);
       sequenceCount++;
 
+      // Wachten tot de pijl verdwijnt (of timeout negeren)
       try {
         await this.instructionImg.waitFor({ state: 'hidden', timeout: 3000 });
         console.log('   Pijl verdwenen → volgende');
       } catch {
+        console.log('   ⏱️ Pijl bleef even staan, verder met volgende...');
         await this.page.waitForTimeout(800);
       }
 
-      // Check of level klaar is
+      // Check of level al voorbij is
       const currentUrl = this.page.url();
       if (!currentUrl.includes('/submarine')) {
         console.log('URL veranderd → level voltooid!');
         break;
       }
 
-      // Forceer als pijl vastzit
+      // Check of dezelfde pijl blijft hangen
       const newSrc = await this.instructionImg.getAttribute('src').catch(() => null);
       if (newSrc === src) {
         console.log('   Pijl niet veranderd → wacht extra');
@@ -68,7 +84,7 @@ class SubmarinePage {
 
   async waitForNextLevel() {
     console.log('23. Wachten op overgang naar volgend level...');
-    await this.page.waitForTimeout(5000);
+    await this.page.waitForTimeout(500);
     console.log('ALLES VOLTOOID: Office → Docking Bay → Submarine pijlen!');
     console.log('Script succesvol afgerond!');
   }
