@@ -18,7 +18,8 @@ class OfficePage {
 
   async clickLetters() {
     console.log('7. Klikken op papieren...');
-    await this.letters.waitFor({ state: 'visible', timeout: 20000 });
+    // Give a bit more time for different browsers/animations
+    await this.letters.waitFor({ state: 'visible', timeout: 40000 });
     await this.letters.click({ force: true });
     console.log('Papieren geklikt.');
   }
@@ -36,11 +37,14 @@ class OfficePage {
     console.log('9. Wachten op kristal op vloer (opacity: 1)...');
     await this.crystalDiv.waitFor({ state: 'attached', timeout: 30000 });
 
-    await this.page.waitForFunction(() => {
-      const el = document.querySelector('div#crystal.crystal');
+    // Use selector as the argument and pass options as the 3rd param.
+    // This avoids accidentally treating the options object as the function arg
+    // and ensures the timeout is applied.
+    await this.page.waitForFunction(selector => {
+      const el = document.querySelector(selector);
       if (!el) return false;
       return window.getComputedStyle(el).opacity === '1';
-    }, { timeout: 10000 });
+    }, 'div#crystal.crystal', { timeout: 30000 });
 
     console.log('Kristal is volledig zichtbaar!');
   }
@@ -53,7 +57,8 @@ class OfficePage {
 
   async waitForCrystalPopup() {
     console.log('11. Wachten op kristal popup...');
-    await this.crystalPopup.waitFor({ state: 'visible', timeout: 30000 });
+    // Popup visibility can depend on animations. Give extra time.
+    await this.crystalPopup.waitFor({ state: 'visible', timeout: 60000 });
     console.log('Kristal popup zichtbaar.');
   }
 

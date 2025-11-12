@@ -13,13 +13,15 @@ class SubmarinePage {
 
   async followArrows() {
     console.log('22. Start submarine level: volg de pijlen...');
-    await this.instructionImg.waitFor({ state: 'visible', timeout: 20000 });
+    // Give more time for the first instruction image to load/appear.
+    await this.instructionImg.waitFor({ state: 'visible', timeout: 40000 });
 
     let sequenceCount = 0;
     const maxSequences = 50;
 
     while (sequenceCount < maxSequences) {
-      await this.instructionImg.waitFor({ state: 'visible', timeout: 10000 });
+  // Inner loop: wait longer for each next arrow—some runs show delays.
+  await this.instructionImg.waitFor({ state: 'visible', timeout: 30000 });
 
       const src = await this.instructionImg.getAttribute('src');
       console.log(`   Pijl: ${src}`);

@@ -1,24 +1,18 @@
-// start.js
-const { chromium } = require('playwright');
-const { config } = require('./config/config');
-const HomePage = require('./pages/HomePage');
-const CharacterSelectPage = require('./pages/CharacterSelectPage');
-const WhoAmIPage = require('./pages/WhoAmIPage');
-const OfficePage = require('./pages/OfficePage');
-const DockingBayPage = require('./pages/DockingBayPage');
-const SubmarinePage = require('./pages/SubmarinePage');
-const CrashPage = require('./pages/CrashPage');
+import { test } from '@playwright/test';
+import HomePage from '../pages/HomePage.js';
+import CharacterSelectPage from '../pages/CharacterSelectPage.js';
+import WhoAmIPage from '../pages/WhoAmIPage.js';
+import OfficePage from '../pages/OfficePage.js';
+import DockingBayPage from '../pages/DockingBayPage.js';
+import SubmarinePage from '../pages/SubmarinePage.js';
+import CrashPage from '../pages/CrashPage.js';
 
-(async () => {
-  const browser = await chromium.launch({
-    headless: config.headless,
-    slowMo: config.slowMo
-  });
+// Increase timeout for this full game flow test because it performs many
+// sequential waits and navigations that can exceed the default 30s per-test timeout.
+test.setTimeout(120000);
 
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-try {
+// Volledige flow test
+test('Hack The Future - Volledige gameflow', async ({ page }) => {
   const home = new HomePage(page);
   const character = new CharacterSelectPage(page);
   const whoami = new WhoAmIPage(page);
@@ -29,9 +23,12 @@ try {
 
   await home.open();
   await home.clickStart();
+
   await character.selectMale();
   await character.confirmYes();
-  await whoami.fillForm('TestPlayer', '25', 'Belgium');
+
+  await whoami.fillForm('Daan', '21', 'Belgium');
+
   await office.gotoOffice();
   await office.clickLetters();
   await office.closeLetterPopup();
@@ -56,15 +53,4 @@ try {
   await submarine.waitForNextLevel();
 
   await crash.doubleClickSquare();
-
-  console.log('HELE SPEL TOT SUBMARINE VOLTOOID!');
-  await page.waitForTimeout(5000);
-
-}catch (err) {
-    console.error('Fout opgetreden:', err.message);
-    await require('./utils/helpers').saveDebug(page, 'final');
-    process.exitCode = 1;
-  } finally {
-    // await browser.close();
-  }
-})();
+});
