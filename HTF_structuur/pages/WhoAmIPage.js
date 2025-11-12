@@ -23,9 +23,9 @@ class WhoAmIPage {
     console.log('Start Game geklikt.');
   }
 
-  async clickStartGame() {
-    // Wordt al gedaan in fillForm, maar kan apart als nodig
-  }
+  // async clickStartGame() {
+  //   // niet meer gebruikt
+  // }
 }
 
 module.exports = WhoAmIPage;

@@ -6,22 +6,21 @@ import OfficePage from '../pages/OfficePage.js';
 import DockingBayPage from '../pages/DockingBayPage.js';
 import SubmarinePage from '../pages/SubmarinePage.js';
 import CrashPage from '../pages/CrashPage.js';
+import CavePage from '../pages/CavePage.js';
 import readline from 'readline';
 
-// Hulpfunctie om Enter af te wachten
 async function waitForEnter() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
-  await new Promise((resolve) => rl.question('\n✅ Test voltooid. Druk op ENTER om af te sluiten...', () => {
+  await new Promise((resolve) => rl.question('\nTest voltooid. Druk op ENTER...', () => {
     rl.close();
     resolve();
   }));
 }
 
-// Verhoogd timeout voor volledige gameflow
-test.setTimeout(120000);
+test.setTimeout(180000);
 
 test('Hack The Future - Volledige gameflow', async ({ page }) => {
   const home = new HomePage(page);
@@ -31,6 +30,7 @@ test('Hack The Future - Volledige gameflow', async ({ page }) => {
   const dockingBay = new DockingBayPage(page);
   const submarine = new SubmarinePage(page);
   const crash = new CrashPage(page);
+  const cave = new CavePage(page);
 
   await home.open();
   await home.clickStart();
@@ -64,7 +64,8 @@ test('Hack The Future - Volledige gameflow', async ({ page }) => {
   await submarine.waitForNextLevel();
 
   await crash.doubleClickSquare();
-
-  // 👇 Pauze zodat het venster open blijft tot jij op Enter drukt
+  const correctCave = await cave.findCorrectCave();
+  console.log(`Correcte cave: ${correctCave}`);
+  await cave.solveCave(1);
   await waitForEnter();
 });
